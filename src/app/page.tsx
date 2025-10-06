@@ -1,103 +1,137 @@
-import Image from "next/image";
+
+'use client';
+
+import { useState } from 'react';
+import FadeIn from './fadeIn';
+
+
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [form, setForm] = useState({
+    name: '',
+    title: '',
+    experience: '',
+    skills: '',
+    education: '',
+    email: '',
+    phone: '',
+    linkedin: '',
+    address: '',
+    theme: 'classic',
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [resume, setResume] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [selectedTheme, setSelectedTheme] = useState('classic');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === 'theme') {
+      setSelectedTheme(e.target.value);
+    }
+  };
+  const handleDownload = async () => {
+  console.log('trying to call api')
+   
+  const resumeHTML = document.getElementById("resume-preview")?.innerHTML;
+  const res = await fetch("/api/pdf", { 
+    method: "POST",
+    headers: {"Content-Type": "application/json"}  ,
+   body: JSON.stringify({ html:resumeHTML}),
+   });
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "resume.pdf"; // filename
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
+
+const [resumeGenerated, setResumeGenerated] = useState(false);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError('');
+    setResume('');
+    try {
+      const res = await fetch('/generate-resume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError(data.error || 'Failed to generate resume.');
+        setResume('');
+      } else {
+        setResume(data.resume);
+      }
+    } catch (err) {
+      setError('Network error.');
+      setResume('');
+    }
+    setLoading(false);
+    setResumeGenerated(true);
+  };
+
+
+  return (
+    <FadeIn duration={100}>
+    <main className="max-w-2xl mx-auto p-6 space-y-4 bg-gradient-to-r bg-gray-900 m-5 rounded ">
+      
+
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="space-y-4"
+      >
+        <input name="name" onChange={handleChange} placeholder="Full Name" className="w-full p-2 border border-blue-600 rounded hover:h-11" />
+        <input name="title" onChange={handleChange} placeholder="Job Title" className="w-full p-2 border border-blue-600 rounded hover:h-11" />
+        <textarea name="experience" onChange={handleChange} placeholder="Experience..." className="w-full p-2 border border-blue-600 rounded" />
+        <input name="skills" onChange={handleChange} placeholder="Skills (comma separated)" className="w-full p-2 border border-blue-600 rounded hover:h-11" />
+        <input name="education" onChange={handleChange} placeholder="Education" className="w-full p-2 border border-blue-600 rounded hover:h-11" />
+        <input name="email" onChange={handleChange} placeholder="Email" className="w-full p-2 border border-blue-600 rounded hover:h-11" />
+        <input name="phone" onChange={handleChange} placeholder="Phone" className="w-full p-2 border border-blue-600 rounded hover:h-11" />
+        <input name="linkedin" onChange={handleChange} placeholder="Linkedin" className="w-full p-2 border border-blue-600 rounded hover:h-11" />
+        <input name="address" onChange={handleChange} placeholder="Address" className="w-full p-2 border border-blue-600 rounded hover:h-11" />
+
+        <label className="block font-semibold">Resume Theme:</label>
+        <select name="theme" value={selectedTheme} onChange={handleChange} className="w-full p-2 border border-blue-600 rounded">
+          <option value="classic" className='text-black'>Classic</option>
+          <option value="modern" className='text-black'>Modern</option>
+          <option value="creative" className='text-black'>Creative</option>
+        </select>
+
+        <button type="submit" className="ml-4 px-4 py-2 border border-cyan-500 rounded hover:bg-cyan-500 hover:text-black transition">
+          {loading ? 'Generating...' : 'Generate Resume'}
+        </button>
+        {resumeGenerated && (
+          <button 
+          type='button'
+          onClick={handleDownload} className="ml-4 px-4 py-2 border border-cyan-500 rounded hover:bg-cyan-500 hover:text-black transition">
+            Download as PDF
+          </button>
+        )}
+      </form>
+
+      {error && (
+        <div className="mt-6 p-4 border rounded bg-red-100 text-red-700">
+          {error}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      )}
+      {resume && !error && (
+        <FadeIn duration={100}>
+        <div id='resume-preview' className={`mt-6 p-4 border rounded bg-blue-600 whitespace-pre-line theme-${selectedTheme}`}>
+          <div className="mb-2 text-sm text-gray-500">Theme: {selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)}</div>
+          {resume}
+        </div>
+        </FadeIn>
+      )}
+    </main>
+    </FadeIn>
   );
 }

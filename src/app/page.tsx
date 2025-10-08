@@ -81,7 +81,7 @@ const [resumeGenerated, setResumeGenerated] = useState(false);
     <FadeIn duration={100}>
     <main className="max-w-2xl mx-auto p-6 space-y-4 bg-gradient-to-r bg-gray-900 m-5 rounded ">
       
-
+ 
       <form
         onSubmit={e => {
           e.preventDefault();

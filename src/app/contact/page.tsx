@@ -50,7 +50,7 @@ export default function Contact() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: 'easeOut' }}
-        className="relative max-w-xl w-full bg-white/5 backdrop-blur-md border border-cyan-500/40 rounded-2xl p-8 shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+        className="relative max-w-xl w-full bg-white/5 backdrop-blur-md border border-cyan-500/40 rounded-2xl p-8 "
       >
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl pointer-events-none" />
 

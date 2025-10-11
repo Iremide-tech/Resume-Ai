@@ -44,4 +44,6 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ resume: '', error: 'Failed to generate resume.' }, { status: 400 });
   }
+  
+
 }

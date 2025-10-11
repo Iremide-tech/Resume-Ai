@@ -124,7 +124,7 @@ const [resumeGenerated, setResumeGenerated] = useState(false);
         </div>
       )}
       {resume && !error && (
-        <FadeIn duration={70}>
+        <FadeIn duration={80}>
         <div id='resume-preview' className={`mt-6 p-4 border rounded bg-blue-600 whitespace-pre-line theme-${selectedTheme}`}>
           <div className="mb-2 text-sm text-gray-500">Theme: {selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)}</div>
           {resume}

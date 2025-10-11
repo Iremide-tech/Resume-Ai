@@ -41,7 +41,7 @@ export default function About() {
         </div>
 
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl border border-purple-500/40">
-          <h2 className="text-2xl font-semibold text-purple-400 mb-2">
+          <h2 className="text-2xl font-semibold text-cyan-400 mb-2">
             Our Vision
           </h2>
           <p className="text-gray-300">
@@ -139,7 +139,7 @@ export default function About() {
           <p className="text-xl text-cyan-400 font-semibold mb-2">
             Awobodu Iremide
           </p>
-          <p className="text-gray-400 mb-4">Frontend Developer & Visionary</p>
+          <p className="text-gray-400 mb-4">Fullstack Developer & Visionary</p>
           <p className="text-gray-300 max-w-xl mx-auto">
             Passionate about building intelligent tools that bridge technology
             and creativity. With HireAble-AI, I aim to help job seekers unlock

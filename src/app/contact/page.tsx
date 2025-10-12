@@ -45,7 +45,7 @@ export default function Contact() {
   };
 
   return (
-    <main className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] text-gray-200 p-6">
+    <main className="flex justify-center items-center min-h-screen  text-gray-200 p-6">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}

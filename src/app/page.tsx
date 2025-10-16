@@ -1,6 +1,38 @@
 
 'use client';
 
+const testResume: string = `
+BENJAMIN A JAMESON
+303/463 Brunswick Street
+Phone: 0421643903
+Email: benjamesonn@gmail.com
+LinkedIn: benjamesonn
+------------------------------------------
+
+SUMMARY:
+
+A seasoned software developer with a decade of experience in the tech industry. Proven ability in coding and adept at using AWS. Skilled at problem-solving and delivering high-quality software solutions.
+
+EXPERIENCE:
+
+Software Developer, Facebook - 10 years
+Developed, tested, and maintained software solutions. Collaborated with cross-functional teams to ensure the delivery of high-quality software products. Leveraged AWS for efficient and reliable cloud computing solutions.
+
+SKILLS:
+
+1. Coding
+2. AWS (Amazon Web Services)
+
+EDUCATION:
+
+Bachelor of Software Development
+
+------------------------------------------
+
+
+`
+
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import FadeIn from './fadeIn';
@@ -20,11 +52,11 @@ export default function Home() {
     theme: 'classic',
   });
 
-  const [resume, setResume] = useState('');
+  const [resume, setResume] = useState(testResume);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('classic');
-  const [resumeGenerated, setResumeGenerated] = useState(false);
+  const [resumeGenerated, setResumeGenerated] = useState(true);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -32,6 +64,8 @@ export default function Home() {
     setForm({ ...form, [e.target.name]: e.target.value });
     if (e.target.name === 'theme') setSelectedTheme(e.target.value);
   };
+
+
 
   const handleDownload = async () => {
     console.log('trying to call api');

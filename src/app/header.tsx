@@ -8,11 +8,12 @@ function NavBar() {
 
   return (
     <nav className="flex justify-between items-center px-8 py-6 bg-gradient-to-r from-cyan-900 via-purple-900 to-black shadow-md relative">
-     
-      <h1 className="text-2xl font-bold text-cyan-400 tracking-widest font-mono">
-        Hireable-AI
-      </h1>
 
+      <Link href="/" >
+        <h1 className="text-2xl font-bold text-cyan-400 tracking-widest font-mono">
+          Hireable-AI
+        </h1>
+      </Link>
       <ul className="hidden md:flex items-center space-x-6">
         <li>
           <Link href="/" className=" hover:text-cyan-400">Home</Link>
@@ -25,7 +26,7 @@ function NavBar() {
         </li>
       </ul>
 
-      
+
       <button
         className="md:hidden text-cyan-400 focus:outline-none"
         onClick={() => setIsOpen(!isOpen)}
@@ -61,34 +62,34 @@ function NavBar() {
         )}
       </button>
 
-      
+
       <AnimatePresence>
-  {isOpen && (
-    <motion.ul
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className="absolute top-16 right-8 bg-black/95 rounded-lg shadow-lg flex flex-col items-start space-y-4 px-6 py-4 md:hidden z-50"
-    >
-      <li>
-        <Link href="/" onClick={() => setIsOpen(false)}>
-          Home
-        </Link>
-      </li>
-      <li>
-        <Link href="/about" onClick={() => setIsOpen(false)}>
-          About
-        </Link>
-      </li>
-      <li>
-        <Link href="/contact" onClick={() => setIsOpen(false)}>
-          Contact
-        </Link>
-      </li>
-    </motion.ul>
-  )}
-</AnimatePresence>
+        {isOpen && (
+          <motion.ul
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="absolute top-16 right-8 bg-black/95 rounded-lg shadow-lg flex flex-col items-start space-y-4 px-6 py-4 md:hidden z-50"
+          >
+            <li>
+              <Link href="/" onClick={() => setIsOpen(false)}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link href="/about" onClick={() => setIsOpen(false)}>
+                About
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" onClick={() => setIsOpen(false)}>
+                Contact
+              </Link>
+            </li>
+          </motion.ul>
+        )}
+      </AnimatePresence>
 
     </nav>
   );

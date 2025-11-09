@@ -1,44 +1,14 @@
-
 'use client';
-
-const testResume: string = `
-BENJAMIN A JAMESON
-303/463 Brunswick Street
-Phone: 0421643903
-Email: benjamesonn@gmail.com
-LinkedIn: benjamesonn
-------------------------------------------
-
-SUMMARY:
-
-A seasoned software developer with a decade of experience in the tech industry. Proven ability in coding and adept at using AWS. Skilled at problem-solving and delivering high-quality software solutions.
-
-EXPERIENCE:
-
-Software Developer, Facebook - 10 years
-Developed, tested, and maintained software solutions. Collaborated with cross-functional teams to ensure the delivery of high-quality software products. Leveraged AWS for efficient and reliable cloud computing solutions.
-
-SKILLS:
-
-1. Coding
-2. AWS (Amazon Web Services)
-
-EDUCATION:
-
-Bachelor of Software Development
-
-------------------------------------------
-
-
-`
-
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import FadeIn from './fadeIn';
-import { FileText, Download } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { FileText } from 'lucide-react';
 
 export default function Home() {
+  const router = useRouter();
+
   const [form, setForm] = useState({
     name: '',
     title: '',
@@ -52,42 +22,20 @@ export default function Home() {
     theme: 'classic',
   });
 
-  const [resume, setResume] = useState(testResume);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState('classic');
-  const [resumeGenerated, setResumeGenerated] = useState(true);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    if (e.target.name === 'theme') setSelectedTheme(e.target.value);
   };
 
-
-
-  const handleDownload = async () => {
-    console.log('trying to call api');
-    const resumeHTML = document.getElementById('resume-preview')?.innerHTML;
-    const res = await fetch('/api/pdf', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ html: resumeHTML }),
-    });
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'resume.pdf';
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError('');
-    setResume('');
+
     try {
       const res = await fetch('/generate-resume', {
         method: 'POST',
@@ -95,15 +43,24 @@ export default function Home() {
         body: JSON.stringify(form),
       });
       const data = await res.json();
+
       if (!res.ok || data.error) {
         setError(data.error || 'Failed to generate resume.');
-      } else {
-        setResume(data.resume);
-        setResumeGenerated(true);
+        setLoading(false);
+        return;
       }
+
+      // ✅ Encode data into URL query parameters
+      const query = new URLSearchParams({
+        ...form,
+        resume: data.resume, // The generated resume text
+      }).toString();
+
+      router.push(`/resume?${query}`);
     } catch {
       setError('Network error.');
     }
+
     setLoading(false);
   };
 
@@ -120,13 +77,7 @@ export default function Home() {
             AI Resume Generator
           </h1>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmit();
-            }}
-            className="space-y-4"
-          >
+          <form onSubmit={handleSubmit} className="space-y-4">
             {[
               { name: 'name', placeholder: 'Full Name' },
               { name: 'title', placeholder: 'Job Title' },
@@ -163,7 +114,7 @@ export default function Home() {
               </label>
               <select
                 name="theme"
-                value={selectedTheme}
+                value={form.theme}
                 onChange={handleChange}
                 className="w-full p-3 bg-[#0f172a] border border-cyan-600/50 rounded-lg text-gray-200 focus:ring-2 focus:ring-cyan-400"
               >
@@ -179,7 +130,7 @@ export default function Home() {
               </select>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 mt-6">
+            <div className="flex items-center gap-4 mt-6">
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: '0 0 20px #06b6d4' }}
                 whileTap={{ scale: 0.98 }}
@@ -189,19 +140,6 @@ export default function Home() {
                 <FileText size={18} />
                 {loading ? 'Generating...' : 'Generate Resume'}
               </motion.button>
-
-              {resumeGenerated && (
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: '0 0 20px #06b6d4' }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={handleDownload}
-                  className="flex items-center gap-2 px-5 py-3 border border-cyan-500 rounded-lg text-cyan-400 hover:bg-cyan-400 hover:text-black transition font-semibold"
-                >
-                  <Download size={18} />
-                  Download as PDF
-                </motion.button>
-              )}
             </div>
           </form>
 
@@ -209,23 +147,6 @@ export default function Home() {
             <div className="mt-6 p-3 bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg">
               {error}
             </div>
-          )}
-
-          {resume && !error && (
-            <FadeIn duration={80}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                id="resume-preview"
-                className={`mt-6 p-6 border border-cyan-600/50 bg-white/5 rounded-lg whitespace-pre-line text-gray-200 theme-${selectedTheme}`}
-              >
-                <div className="mb-2 text-sm text-cyan-400">
-                  Theme: {selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)}
-                </div>
-                {resume}
-              </motion.div>
-            </FadeIn>
           )}
         </motion.div>
       </main>

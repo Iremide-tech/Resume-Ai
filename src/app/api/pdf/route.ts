@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const { html } = await req.json();
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.goto("http://localhost:3000/", { waitUntil: "networkidle0" });
+  await page.goto("http://localhost:3000/",{ waitUntil: "networkidle0" });
   // wait 1 second
 
   const resumePreview = await page.$("#resume-preview");

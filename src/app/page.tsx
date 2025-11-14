@@ -50,10 +50,10 @@ export default function Home() {
         return;
       }
 
-      // ✅ Encode data into URL query parameters
+      
       const query = new URLSearchParams({
         ...form,
-        resume: data.resume, // The generated resume text
+        resume: data.resume, 
       }).toString();
 
       router.push(`/resume?${query}`);

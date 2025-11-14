@@ -18,9 +18,45 @@ export default function ResumePage() {
   const theme = params.get('theme');
   const resume = params.get('resume');
 
+  const handleDownload = async () => {
+    const element = document.getElementById("resume-preview");
+    if (!element) {
+      alert("Resume preview not found");
+      return;
+    }
+
+    const html = element.outerHTML;
+
+    const res = await fetch("/api/pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ html }),
+    });
+
+    if (!res.ok) {
+      alert("Failed to generate PDF");
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "resume.pdf";
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
-    <main className="min-h-screen flex justify-center items-start py-12 bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] text-gray-200">
+    <main className="min-h-screen flex flex-col justify-center items-center py-12 bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] text-gray-200">
+      
+      {/* RESUME PREVIEW */}
       <motion.div
+        id="resume-preview"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -47,6 +83,14 @@ export default function ResumePage() {
 
         <p className="mt-6 text-sm text-cyan-300 text-center">Theme: {theme}</p>
       </motion.div>
+
+      {/* DOWNLOAD BUTTON */}
+      <button
+        onClick={handleDownload}
+        className="mt-8 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-white font-bold rounded-lg shadow-lg transition"
+      >
+        Download PDF
+      </button>
     </main>
   );
 }

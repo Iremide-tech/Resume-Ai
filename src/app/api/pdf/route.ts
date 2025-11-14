@@ -2,48 +2,44 @@ import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 
 export async function POST(req: NextRequest) {
-  console.log("api called");
-  const { html } = await req.json();
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto("http://localhost:3000/",{ waitUntil: "networkidle0" });
-  // wait 1 second
+  try {
+    console.log("PDF API called");
+    const { html } = await req.json();
 
-  const resumePreview = await page.$("#resume-preview");
-  if (!resumePreview) {
-    console.log("no resume preview found");
-    return new NextResponse("No resume preview found", { status: 400 });
-  }
+    if (!html) {
+      return new NextResponse("Missing HTML", { status: 400 });
+    }
 
-  // Get the bounding box of the element
-  const boundingBox = await resumePreview.boundingBox();
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
 
-  if (!boundingBox) {
-    console.log("could not determine bounding box");
-    return new NextResponse("Could not determine bounding box", {
-      status: 400,
+    const page = await browser.newPage();
+
+    // Load HTML into Puppeteer
+    await page.setContent(html, { waitUntil: "networkidle0" });
+
+    // Generate the PDF
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+    });
+
+    await browser.close();
+
+    return new NextResponse(Buffer.from(pdfBuffer), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": "attachment; filename=resume.pdf",
+      },
+    });
+  } catch (error: unknown) {
+    console.error("PDF ERROR:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return new NextResponse("PDF generation failed: " + errorMessage, {
+      status: 500,
     });
   }
-
-  // Generate PDF clipped to the element’s bounding box
-  const pdfBuffer = await page.pdf({
-    format: "A4",
-    // clip: {
-    //   x: boundingBox.x,
-    //   y: boundingBox.y,
-    //   width: boundingBox.width,
-    //   height: boundingBox.height,
-    // },
-    printBackground: true,
-  });
-
-  await browser.close();
-
-  return new NextResponse(Buffer.from(pdfBuffer), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": "attachment; filename=resume.pdf",
-    },
-  });
 }

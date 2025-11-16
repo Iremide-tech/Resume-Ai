@@ -38,6 +38,7 @@ export default function ResumePage() {
     if (!res.ok) {
       alert("Failed to generate PDF");
       return;
+      
     }
 
     const blob = await res.blob();
@@ -60,28 +61,72 @@ export default function ResumePage() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-3xl bg-white/5 backdrop-blur-md border border-cyan-500/30 rounded-2xl p-8 shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+        style={{
+          width: '100%',
+          maxWidth: '800px',
+          background: '#ffffff',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          padding: '40px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          fontFamily: 'Arial, sans-serif',
+          color: '#333',
+          lineHeight: '1.6',
+        }}
       >
-        <h1 className="text-3xl font-bold text-center text-cyan-400 mb-4">{name}</h1>
-        <p className="text-center text-gray-400 mb-2">{title}</p>
-        <p className="text-center text-gray-400 mb-6">
-          {email} • {phone} • {linkedin} • {address}
+        <style>{`
+          #resume-preview h1 {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+          }
+          #resume-preview h2 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+          }
+          #resume-preview p {
+            margin: 8px 0;
+            font-size: 14px;
+          }
+          #resume-preview .contact-info {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 12px;
+          }
+          #resume-preview .content {
+            white-space: pre-line;
+            font-size: 13px;
+          }
+          #resume-preview .theme-label {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+          }
+        `}</style>
+
+        <h1>{name}</h1>
+        <p style={{ textAlign: 'center', fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+          {title}
         </p>
-
-        <div className="border-t border-cyan-500/30 pt-4 whitespace-pre-line">
-          {resume || `
-          EXPERIENCE:
-          ${experience || '—'}
-
-          SKILLS:
-          ${skills || '—'}
-
-          EDUCATION:
-          ${education || '—'}
-          `}
+        <div className="contact-info">
+          {email} • {phone} • {linkedin} • {address}
         </div>
 
-        <p className="mt-6 text-sm text-cyan-300 text-center">Theme: {theme}</p>
+        <div className="content">
+          {resume || `EXPERIENCE:\n${experience || '—'}\n\nSKILLS:\n${skills || '—'}\n\nEDUCATION:\n${education || '—'}`}
+        </div>
+
+        <div className="theme-label">Theme: {theme || 'classic'}</div>
       </motion.div>
 
       {/* DOWNLOAD BUTTON */}
